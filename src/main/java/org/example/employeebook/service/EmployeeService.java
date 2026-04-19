@@ -6,51 +6,51 @@ import org.example.employeebook.exceptions.EmployeeNotFoundException;
 import org.example.employeebook.exceptions.EmployeeStorageIsFullException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class EmployeeService {
 
     private static final int MAXIMUM_NUMBER_OF_EMPLOYEES = 5;
 
-    private final List<Employee> employees = new ArrayList<>();
+    private final Map<String, Employee> employees = new HashMap<>();
 
     public Employee addEmployee(String firstName, String lastName) {
+        Employee employee = new Employee(firstName, lastName);
+
         if (employees.size() >= MAXIMUM_NUMBER_OF_EMPLOYEES) {
             throw new EmployeeStorageIsFullException("Превышен лимит количества сотрудников в фирме");
         }
-        for (Employee emp : employees) {
-            if (emp.getFirstName().equals(firstName) && emp.getLastName().equals(lastName)) {
-                throw new EmployeeAlreadyAddedException("В фирме уже есть такой сотрудник");
-            }
+
+        if (employees.containsKey(employee.getFullName())) {
+            throw new EmployeeAlreadyAddedException("В фирме уже есть данный сотрудник");
         }
-        Employee employee = new Employee(firstName, lastName);
-        employees.add(employee);
+
+        employees.put(employee.getFullName(), employee);
+
         return employee;
     }
 
     public Employee getEmployee(String firstName, String lastName) {
-        for (Employee emp : employees) {
-            if (emp.getFirstName().equals(firstName) && emp.getLastName().equals(lastName)) {
-                return emp;
-            }
+        Employee employee = new Employee(firstName, lastName);
+        if (!employees.containsKey(employee.getFullName())) {
+            throw new EmployeeNotFoundException("Сотрудник не найден");
         }
-        throw new EmployeeNotFoundException("Сотрудник не найден");
+        return employee;
     }
+
 
     public Employee removeEmployee(String firstName, String lastName) {
-        for (Employee emp : employees) {
-            if (emp.getFirstName().equals(firstName) && emp.getLastName().equals(lastName)) {
-                employees.remove(emp);
-                return emp;
-            }
+        Employee employee = new Employee(firstName, lastName);
+
+        if (!employees.containsKey(employee.getFullName())) {
+            throw new EmployeeNotFoundException("Сотрудник не найден");
         }
-        throw new EmployeeNotFoundException("Сотрудник не найден");
+        employees.remove(employee.getFullName());
+        return employee;
     }
 
-    public List<Employee> getAllEmployees() {
-        return employees;
+    public Collection<Employee> getAllEmployees() {
+        return employees.values();
     }
 }

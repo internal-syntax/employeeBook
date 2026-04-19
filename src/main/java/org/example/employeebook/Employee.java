@@ -27,6 +27,10 @@ public class Employee {
         this.lastName = lastName;
     }
 
+    public String getFullName() {
+        return firstName + "_" + lastName;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
