@@ -13,10 +13,10 @@ public class EmployeeService {
 
     private static final int MAXIMUM_NUMBER_OF_EMPLOYEES = 5;
 
-    private final Map<String, Employee> employees = new HashMap<>();
+    protected final Map<String, Employee> employees = new HashMap<>();
 
-    public Employee addEmployee(String firstName, String lastName) {
-        Employee employee = new Employee(firstName, lastName);
+    public Employee addEmployee(String firstName, String lastName, int numberDepartment, int salary) {
+        Employee employee = new Employee(firstName, lastName, numberDepartment, salary);
 
         if (employees.size() >= MAXIMUM_NUMBER_OF_EMPLOYEES) {
             throw new EmployeeStorageIsFullException("Превышен лимит количества сотрудников в фирме");
@@ -32,22 +32,27 @@ public class EmployeeService {
     }
 
     public Employee getEmployee(String firstName, String lastName) {
-        Employee employee = new Employee(firstName, lastName);
+
+        String key = firstName + " " + lastName;
+
+        Employee employee = employees.get(key);
+
         if (!employees.containsKey(employee.getFullName())) {
-            throw new EmployeeNotFoundException("Сотрудник не найден");
+            throw new EmployeeNotFoundException();
         }
+
         return employee;
     }
 
-
     public Employee removeEmployee(String firstName, String lastName) {
-        Employee employee = new Employee(firstName, lastName);
 
-        if (!employees.containsKey(employee.getFullName())) {
-            throw new EmployeeNotFoundException("Сотрудник не найден");
+        String key = firstName + " " + lastName;
+
+        if (!employees.containsKey(key)) {
+            throw new EmployeeNotFoundException();
         }
-        employees.remove(employee.getFullName());
-        return employee;
+
+        return employees.remove(key);
     }
 
     public Collection<Employee> getAllEmployees() {
